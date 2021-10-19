@@ -9,12 +9,12 @@ import { BaseChartDirective, Color, Label } from 'ng2-charts';
   styleUrls: ['./chart-of-balance.component.scss']
 })
 export class ChartOfBalanceComponent implements OnInit {
-  @Input() tradesGroup: FormGroup;
+  @Input() chartForm: FormGroup;
   @ViewChild(BaseChartDirective) chart: BaseChartDirective;
   public lineChartData: ChartDataSets[] = [
-    { data: this.rangePrice, label: 'Series A' },
+    { data: [], label: 'Series A' },
   ];
-  public lineChartLabels: Label[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+  public lineChartLabels: Label[] = [];
   public lineChartOptions: (ChartOptions & { annotation?: any; }) = {
     responsive: true,
   };
@@ -30,36 +30,12 @@ export class ChartOfBalanceComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {
-    console.log(this.tradesGroup);
-    this.tradesGroup.valueChanges.subscribe(() => {
-      console.log('12');
-      this.lineChartData = [
-        { data: this.rangePrice, label: 'Series A' },
-      ];
-      this.lineChartLabels = this.getDateArray(this.tradesGroup.controls.entryDate.value, this.tradesGroup.controls.exitDate.value);
-    });
-  }
-  co() {
-    console.log(this.rangePrice);
-    console.log(this.getDateArray(this.tradesGroup.controls.entryDate.value, this.tradesGroup.controls.exitDate.value));
-    this.chart.ngOnChanges({});
-
-  }
-
-  getDateArray(start, end) {
-    var arr = new Array();
-    var dt = new Date(start);
-    while (dt <= end) {
-      arr.push(new Date(dt));
-      dt.setDate(dt.getDate() + 1);
-    }
-    return arr;
-  }
-
-  get rangePrice() {
-    const exitPrice = this.tradesGroup?.get('exitPrice')?.value || 0;
-    const entryPrice = this.tradesGroup?.get('entryPrice')?.value || 0;
-    return Array.from({ length: exitPrice - +entryPrice + 1 }, (_, i) => +entryPrice + i);
+  ngOnInit(): void {
+    this.chartForm.valueChanges.subscribe(() => {
+        this.lineChartData = [
+                { data: this.chartForm.get('arrayBalance').value, label: 'Series A' },
+        ];
+        this.lineChartLabels = this.chartForm.get('arrayExitDate').value
+    })
   }
 }
